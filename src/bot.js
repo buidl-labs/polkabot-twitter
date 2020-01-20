@@ -203,7 +203,7 @@ eraChange.on("newEra", async () => {
 	await api.derive.session.info(header => {
 		const eraProgress = header.eraProgress.toString();
 		// console.log(eraLength,eraProgress,sessionLength,sessionProgress)
-		if (parseInt(eraProgress) === 1245) {
+		if (parseInt(eraProgress) === 150) {
 			//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
 			eraChange.emit("newEra");
 		}
