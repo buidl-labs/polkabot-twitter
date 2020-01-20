@@ -1,0 +1,28 @@
+{
+  "name": "polkabot-twitter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A twitter bot tracking the Polkadot Network to automate updates on milestone events",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "format": "pretty-quick",
+    "precommit": "pretty-quick --staged"
+  },
+  "pre-commit": [
+    "format"
+  ],
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "prettier": "1.15.1",
+    "pretty-quick": "1.8.0"
+  },
+  "dependencies": {
+    "@polkadot/api": "^0.100.1",
+    "@sentry/node": "^5.11.0",
+    "dotenv": "6.1.0",
+    "mongoose": "^5.8.7",
+    "puppeteer": "^2.0.0",
+    "twit": "2.2.11"
+  }
+}
