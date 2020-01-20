@@ -120,11 +120,13 @@ async function postTopThreeBackedValidatorsByNominatorsOnTwitter() {
 				console.log("list", list);
 				bot
 					.post("statuses/update", {
-						status: `Most Backed Validator Leaderboard for previous era on @kusamanetwork
-      🥇${validator[0].noOfNominators} backers on ${validator[0].name}
-      🥈${validator[1].noOfNominators} backers on ${validator[1].name}
-      🥉${validator[2].noOfNominators} backers on ${validator[2].name}
-      See how many nominators are backing validators on polkanalytics.com`,
+            status: `Most Backed Validator Leaderboard for previous era on @kusamanetwork
+
+  🥇${validator[0].noOfNominators} backers on ${validator[0].name}
+  🥈${validator[1].noOfNominators} backers on ${validator[1].name}
+  🥉${validator[2].noOfNominators} backers on ${validator[2].name}
+
+See how many nominators are backing validators on polkanalytics.com`,
 						media_ids: list
 					})
 					.catch(err => {
@@ -278,18 +280,19 @@ function uploadImages(images, validator) {
 			console.log("list", list);
 			bot
 				.post("statuses/update", {
-					status: `Highest Pool Reward Validator Leaderboard for previous era on @kusamanetwork
-      🥇${parseFloat(validator[0].poolRewardWithCommission).toFixed(3)} KSM for ${
+          status: `Highest Pool Reward Validator Leaderboard for previous era on @kusamanetwork
+
+  🥇${parseFloat(validator[0].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[0].name
 					}
-      🥈${parseFloat(validator[1].poolRewardWithCommission).toFixed(3)} KSM for ${
+  🥈${parseFloat(validator[1].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[1].name
 					}
-      🥉${parseFloat(validator[2].poolRewardWithCommission).toFixed(3)} KSM for ${
+  🥉${parseFloat(validator[2].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[2].name
 					}
         
-      See how much you could be earning on https://polkanalytics.com/`,
+See how much you could be earning on https://polkanalytics.com/`,
 					media_ids: list
 				})
 				.catch(err => {
