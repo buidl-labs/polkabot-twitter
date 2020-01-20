@@ -33,9 +33,12 @@ mongoose
 	.catch(() => console.log("database failed to connect"));
 
 async function getValidators() {
-	const result = await Validator.find()
-		.sort("-poolRewardWithCommission")
-		.limit(3);
+  //Get top three validators with highest pool reward without commission,
+  //removing all validators where poolRewardWithCommission equals Not enough data
+  const result = await Validator.find()
+  .where("poolRewardWithCommission").ne("Not enough data")
+  .sort("-poolRewardWithCommission")
+  .limit(3);
 
 	return result;
 }
