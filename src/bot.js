@@ -203,7 +203,7 @@ eraChange.on("newEra", async () => {
 	await api.derive.session.info(header => {
 		const eraProgress = header.eraProgress.toString();
 		// console.log(eraLength,eraProgress,sessionLength,sessionProgress)
-		if (parseInt(eraProgress) === 150) {
+		if (parseInt(eraProgress) === 1245) {
 			//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
 			eraChange.emit("newEra");
 		}
@@ -279,13 +279,13 @@ function uploadImages(images, validator) {
 			bot
 				.post("statuses/update", {
 					status: `Highest Pool Reward Validator Leaderboard for previous era on @kusamanetwork
-      🥇${validator[0].poolRewardWithCommission.toFixed(3)} KSM for ${
+      🥇${parseFloat(validator[0].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[0].name
 					}
-      🥈${validator[1].poolRewardWithCommission.toFixed(3)} KSM for ${
+      🥈${parseFloat(validator[1].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[1].name
 					}
-      🥉${validator[2].poolRewardWithCommission.toFixed(3)} KSM for ${
+      🥉${parseFloat(validator[2].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[2].name
 					}
         
