@@ -227,6 +227,12 @@ async function takeScreenShot(
   await page.setViewport({ width: 1920, height: 1080 });
   console.log('Waiting for page to load...');
   await page.waitForSelector(waitForElement, { timeout: 3000000 });
+  await page.focus("[aria-label='Switch to dark mode']");
+  await page.waitFor(2000);
+  await page.click("[aria-label='Switch to dark mode']");
+  await page.focus("body");
+  await page.waitFor(2000);
+  await page.click("body")
   await page.screenshot({ path: outputPath, fullPage: fullPage });
   console.log('Screenshot taken!');
 
