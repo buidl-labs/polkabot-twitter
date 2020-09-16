@@ -54,6 +54,8 @@ Distributing information about incentives for participating in the Polkadot ecos
   ```bash
   npm start
   ```
+  
+  The top validator page should be available on http://localhost:3000/#/top-validator and the top nominator page on http://localhost:3000/#/top-nominator
 
 ## Gratitude <a name = "gratitude"></a>
 
