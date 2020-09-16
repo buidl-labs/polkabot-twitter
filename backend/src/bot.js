@@ -1,6 +1,7 @@
 // listen on port so now.sh likes it
 const { createServer } = require("http");
 const https = require("https");
+const axios = require("axios");
 const fs = require("fs"),
 	path = require("path"),
 	puppeteer = require("puppeteer"),
@@ -15,30 +16,30 @@ const { ApiPromise, WsProvider } = require("@polkadot/api");
 const EventEmitter = require("events");
 const eraChange = new EventEmitter();
 
+let previousEra = 0;
+let currentEra = 0;
+
+let topValidatorData = {};
+let topNominatorData = {};
+
 const Sentry = require("@sentry/node");
 Sentry.init({
-	dsn: "https://0fe83f6a410e4acdb2be9d953030e021@sentry.io/1885487"
+	dsn: "https://0fe83f6a410e4acdb2be9d953030e021@sentry.io/1885487",
 });
 
 // const eraChange = polkadotInfo.eraChange;
 // const retweet = require("./api/retweet");
 // const reply = require("./api/reply");
 //yo
-mongoose
-	.connect(
-		config.dbUrl,
-		{ useNewUrlParser: true, useUnifiedTopology: true }
-	)
-	.then(() => console.log("connected to database"))
-	.catch(() => console.log("database failed to connect"));
 
 async function getValidators() {
-  //Get top three validators with highest pool reward without commission,
-  //removing all validators where poolRewardWithCommission equals Not enough data
-  const result = await Validator.find()
-  .where("poolRewardWithCommission").ne("Not enough data")
-  .sort("-poolRewardWithCommission")
-  .limit(3);
+	//Get top three validators with highest pool reward without commission,
+	//removing all validators where poolRewardWithCommission equals Not enough data
+	const result = await Validator.find()
+		.where("poolRewardWithCommission")
+		.ne("Not enough data")
+		.sort("-poolRewardWithCommission")
+		.limit(3);
 
 	return result;
 }
@@ -86,7 +87,7 @@ async function postTopThreeBackedValidatorsByNominatorsOnTwitter() {
 			console.log("files", files);
 			//Only take the top validators screenshot
 			const fileImages = files.filter(
-				file => validator[0].stashId === file.split(".")[0]
+				(file) => validator[0].stashId === file.split(".")[0]
 			);
 			console.log("fileImages", fileImages);
 			postOnTwitter(fileImages, validator);
@@ -119,24 +120,24 @@ async function postTopThreeBackedValidatorsByNominatorsOnTwitter() {
 		console.log("Uploading an image...");
 
 		Promise.all([uploadImg(images)])
-			.then(list => {
+			.then((list) => {
 				console.log("list", list);
 				bot
 					.post("statuses/update", {
-            status: `Most Backed Validator Leaderboard for previous era on @kusamanetwork
+						status: `Most Backed Validator Leaderboard for previous era on @kusamanetwork
 
   🥇${validator[0].noOfNominators} backers on ${validator[0].name}
   🥈${validator[1].noOfNominators} backers on ${validator[1].name}
   🥉${validator[2].noOfNominators} backers on ${validator[2].name}
 
 See how many nominators are backing validators on polkanalytics.com`,
-						media_ids: list
+						media_ids: list,
 					})
-					.catch(err => {
+					.catch((err) => {
 						console.log("twit bot err", err);
 					});
 			})
-			.catch(err => {
+			.catch((err) => {
 				console.log("err", err);
 			});
 	}
@@ -144,28 +145,30 @@ See how many nominators are backing validators on polkanalytics.com`,
 
 async function takeScreenShots() {
 	//   console.log('test, start');
-	const validator = await getValidators();
+	const validator = topValidatorData;
+	console.log("validator");
+	console.log(JSON.stringify(validator));
 
 	await takeScreenShot(
-		__dirname + "/images/" + validator[0].stashId + ".png",
-		"https://polkanalytics.com/#/kusama/validator/" + validator[0].stashId,
+		__dirname + "/images/" + validator.stashId + ".png",
+		"https://ys-topvalidator.surge.sh",
 		".konvajs-content",
 		true
 	);
 
-	await takeScreenShot(
-		__dirname + "/images/" + validator[1].stashId + ".png",
-		"https://polkanalytics.com/#/kusama/validator/" + validator[1].stashId,
-		".konvajs-content",
-		true
-	);
+	// await takeScreenShot(
+	// 	__dirname + "/images/" + validator[1].stashId + ".png",
+	// 	"https://polkanalytics.com/#/kusama/validator/" + validator[1].stashId,
+	// 	".konvajs-content",
+	// 	true
+	// );
 
-	await takeScreenShot(
-		__dirname + "/images/" + validator[2].stashId + ".png",
-		"https://polkanalytics.com/#/kusama/validator/" + validator[2].stashId,
-		".konvajs-content",
-		true
-	);
+	// await takeScreenShot(
+	// 	__dirname + "/images/" + validator[2].stashId + ".png",
+	// 	"https://polkanalytics.com/#/kusama/validator/" + validator[2].stashId,
+	// 	".konvajs-content",
+	// 	true
+	// );
 	//   console.log('test, end');
 	return validator;
 }
@@ -178,9 +181,9 @@ async function takeScreenShotsAndPostItOnTwitter() {
 			throw err;
 		} else {
 			console.log("files", files);
-			const fileImages = validator.map(validator => {
+			const fileImages = validator.map((validator) => {
 				const id = files.find(
-					imageName => imageName.split(".")[0] === validator.stashId
+					(imageName) => imageName.split(".")[0] === validator.stashId
 				);
 				return id;
 			});
@@ -201,19 +204,25 @@ eraChange.on("newEra", async () => {
 	}
 });
 
-(async () => {
-	const wsProvider = new WsProvider("wss://kusama-rpc.polkadot.io");
-	const api = await ApiPromise.create({ provider: wsProvider });
-
-	await api.derive.session.info(header => {
-		const eraProgress = header.eraProgress.toString();
-		// console.log(eraLength,eraProgress,sessionLength,sessionProgress)
-		if (parseInt(eraProgress) === 150) {
-			//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
-			eraChange.emit("newEra");
-		}
-		console.log(`eraProgress ${parseInt(eraProgress)}`);
-	});
+(() => {
+	axios
+		.get("https://yieldscan-api.onrender.com/api/twitter/top-validator")
+		.then(({ data }) => {
+			console.log(JSON.stringify(data));
+			currentEra = data[0].eraIndex;
+			console.log(currentEra);
+			console.log(previousEra);
+			topValidatorData = data[0];
+			console.log(topValidatorData);
+			// && previousEra !== 0
+			if (currentEra > previousEra) {
+				//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
+				eraChange.emit("newEra");
+			}
+			console.log("hello");
+			previousEra = currentEra;
+		})
+		.catch(() => console.log("database failed retrieve data"));
 })();
 
 // This will allow the bot to run on now.sh
@@ -232,20 +241,32 @@ async function takeScreenShot(
 	fullPage
 ) {
 	console.log("Launching chromium");
-	const browser = await puppeteer.launch({ args: ["--no-sandbox"] });
+	const browser = await puppeteer.launch({
+		// args: ["--no-sandbox"],
+		headless: false,
+		product: "firefox",
+	});
 	const page = await browser.newPage();
 
 	console.log("validatorUrl", validatorUrl);
 	console.log("Accessing URL...");
-	await page.goto(validatorUrl);
-	await page.setViewport({ width: 1920, height: 1080 });
+	try {
+		await page.goto(validatorUrl, {
+			waitUntil: "load",
+			// Remove the timeout
+			timeout: 0,
+		});
+		await page.setViewport({ width: 1012, height: 506 });
+	} catch (error) {
+		console.log(error);
+	}
 	console.log("Waiting for page to load...");
-	await page.waitForSelector(waitForElement, { timeout: 3000000 });
-	await page.focus("[aria-label='Switch to dark mode']");
-	await page.waitFor(2000);
-	await page.click("[aria-label='Switch to dark mode']");
-	await page.focus("body");
-	await page.waitFor(2000);
+	await page.waitForSelector(waitForElement, { timeout: 300000 });
+	// await page.focus("[aria-label='Switch to dark mode']");
+	// await page.waitFor(2000);
+	// await page.click("[aria-label='Switch to dark mode']");
+	// await page.focus("body");
+	// await page.waitFor(2000);
 	await page.click("body");
 	await page.screenshot({ path: outputPath, fullPage: fullPage });
 	console.log("Screenshot taken!");
@@ -277,13 +298,13 @@ function uploadImages(images, validator) {
 	Promise.all([
 		uploadImg(images[0]),
 		uploadImg(images[1]),
-		uploadImg(images[2])
+		uploadImg(images[2]),
 	])
-		.then(list => {
+		.then((list) => {
 			console.log("list", list);
 			bot
 				.post("statuses/update", {
-          status: `Highest Pool Reward Validator Leaderboard for previous era on @kusamanetwork
+					status: `Highest Pool Reward Validator Leaderboard for previous era on @kusamanetwork
 
   🥇${parseFloat(validator[0].poolRewardWithCommission).toFixed(3)} KSM for ${
 						validator[0].name
@@ -296,13 +317,13 @@ function uploadImages(images, validator) {
 					}
         
 See how much you could be earning on https://polkanalytics.com/`,
-					media_ids: list
+					media_ids: list,
 				})
-				.catch(err => {
+				.catch((err) => {
 					console.log("twit bot err", err);
 				});
 		})
-		.catch(err => {
+		.catch((err) => {
 			console.log("err", err);
 		});
 }
