@@ -259,7 +259,7 @@ const main = async () => {
 			currentEra = data[0].eraIndex;
 			topValidatorData = data[0];
 			// && previousEra !== 0
-			if (currentEra > previousEra) {
+			if (currentEra > previousEra && previousEra !== 0) {
 				//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
 				eraChange.emit("newEra");
 			}
