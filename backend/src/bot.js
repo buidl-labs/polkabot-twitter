@@ -156,9 +156,6 @@ See how many nominators are backing validators on polkanalytics.com`,
 async function takeScreenShots() {
 	//   console.log('test, start');
 	const validator = topValidatorData;
-	console.log("validator");
-	console.log(JSON.stringify(validator));
-
 	await takeScreenShot(
 		__dirname + "/images/" + validator.stashId + ".png",
 		"https://polkabot-twitter.netlify.app/#/top-validator",
@@ -187,9 +184,6 @@ async function takeNomScreenShots() {
 	//   console.log('test, start');
 	const nominator = await getNominatorsData();
 
-	console.log("takeNomScreenShots - nominator");
-	console.log(nominator.data);
-
 	await takeScreenShot(
 		__dirname + "/images/" + nominator.data.nomId + ".png",
 		"https://polkabot-twitter.netlify.app/#/top-nominator",
@@ -216,7 +210,6 @@ async function takeNomScreenShots() {
 
 async function takeValidatorScreenShotsAndPostItOnTwitter() {
 	const validator = await takeScreenShots();
-	console.log("validator", validator);
 	fs.readdir(__dirname + "/images", (err, files) => {
 		if (err) {
 			throw err;
@@ -233,12 +226,6 @@ async function takeValidatorScreenShotsAndPostItOnTwitter() {
 
 async function takeNominatorScreenShotsAndPostItOnTwitter() {
 	const nominator = await takeNomScreenShots();
-	console.log("++++++++helo++++++++");
-	console.log("nominator");
-	console.log(nominator);
-	console.log("nominator", nominator);
-	console.log("nomId");
-	console.log(nominator.nomId);
 	fs.readdir(__dirname + "/images", (err, files) => {
 		if (err) {
 			throw err;
@@ -265,26 +252,29 @@ eraChange.on("newEra", async () => {
 	}
 });
 
-(() => {
+const main = async () => {
 	axios
 		.get("https://yieldscan-api.onrender.com/api/twitter/top-validator")
 		.then(({ data }) => {
-			console.log(JSON.stringify(data));
 			currentEra = data[0].eraIndex;
-			console.log(currentEra);
-			console.log(previousEra);
 			topValidatorData = data[0];
-			console.log(topValidatorData);
 			// && previousEra !== 0
 			if (currentEra > previousEra) {
 				//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
 				eraChange.emit("newEra");
 			}
-			console.log("hello");
 			previousEra = currentEra;
+			console.log("waiting for new era...");
 		})
 		.catch(() => console.log("database failed retrieve data"));
-})();
+};
+
+setInterval(() => {
+	main().catch((err) => {
+		console.log(err);
+		process.exit(1);
+	});
+}, 10 * 60 * 1000);
 
 // This will allow the bot to run on now.sh
 const server = createServer((req, res) => {
@@ -351,19 +341,14 @@ async function uploadImages(images, validator) {
 			? validator.stashId.slice(0, 5) + "..." + validator.stashId.slice(-5)
 			: validator.stashId;
 
-	console.log("actorIdentity");
-	console.log(actorIdentity);
-
-	actorIdentity = "abc";
-
 	const poolReward = validator.estimatedPoolReward.toFixed(3);
-	console.log(poolReward);
+	// console.log(poolReward);
 
 	const subPoolReward = await convertCurrency(poolReward, "kusama").then(
 		(convertedValue) => convertedValue
 	);
-	console.log("subPoolReward");
-	console.log(subPoolReward);
+	// console.log("subPoolReward");
+	// console.log(subPoolReward);
 
 	function uploadImg(image) {
 		return new Promise((resolve, reject) => {
@@ -374,7 +359,7 @@ async function uploadImages(images, validator) {
 					reject(err);
 				} else {
 					console.log("Image successfully uploaded!");
-					console.log("data", data);
+					// console.log("data", data);
 					resolve(data.media_id_string);
 				}
 			});
@@ -389,7 +374,7 @@ async function uploadImages(images, validator) {
 		// uploadImg(images[2]),
 	])
 		.then((list) => {
-			console.log("list", list);
+			// console.log("list", list);
 			bot
 				.post("statuses/update", {
 					status: `${actorIdentity}'s pool was the highest earning validator pool for the previous era on kusamanetwork with ${poolReward} KSM ($${subPoolReward.toFixed(
@@ -422,28 +407,21 @@ async function uploadNomImages(images, nominator) {
 	// 		? validator.stashId.slice(0, 5) + "..." + validator.stashId.slice(-5)
 	// 		: validator.stashId;
 
-	console.log("nominator");
-	console.log(nominator);
-	console.log("nomId");
-	console.log(nominator.nomId);
-
 	const actorIdentity =
 		nominator.nomId.length > 11
 			? nominator.nomId.slice(0, 5) + "..." + nominator.nomId.slice(-5)
 			: nominator.nomId;
 
-	console.log(actorIdentity);
-
 	const nomReward = nominator.nomEraReward.toFixed(3);
-	console.log(nomReward);
+	// console.log(nomReward);
 
 	const subPoolReward = await convertCurrency(nomReward, "kusama").then(
 		(convertedValue) => convertedValue
 	);
-	console.log("subPoolReward");
-	console.log(subPoolReward);
+	// console.log("subPoolReward");
+	// console.log(subPoolReward);
 
-	console.log(images);
+	// console.log(images);
 
 	function uploadNomImg(image) {
 		return new Promise((resolve, reject) => {
