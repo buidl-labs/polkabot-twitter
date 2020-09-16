@@ -18,7 +18,7 @@ const eraChange = new EventEmitter();
 
 let previousEra = 0;
 let currentEra = 0;
-
+console.log("🎉 twitter bot running 🎉");
 let topValidatorData = {};
 let topNominatorData = {};
 
@@ -379,7 +379,7 @@ async function uploadImages(images, validator) {
 				.post("statuses/update", {
 					status: `${actorIdentity}'s pool was the highest earning validator pool for the previous era on kusamanetwork with ${poolReward} KSM ($${subPoolReward.toFixed(
 						2
-					)}) earned. See your potential earnings on https://yieldscan.onrender.com`,
+					)}) earned.`,
 					media_ids: list,
 				})
 				.catch((err) => {
@@ -452,7 +452,7 @@ async function uploadNomImages(images, nominator) {
 				.post("statuses/update", {
 					status: `${actorIdentity} was the highest earning nominator for the previous era on kusamanetwork with ${nomReward} KSM ($${subPoolReward.toFixed(
 						2
-					)}) earned. See your potential earnings on https://yieldscan.onrender.com`,
+					)}) earned.`,
 					media_ids: list,
 				})
 				.catch((err) => {
