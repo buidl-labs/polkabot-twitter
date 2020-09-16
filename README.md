@@ -1,6 +1,6 @@
 # PolkaBot Twitter
 
-Spreading information about incentives for participating in the Polkadot ecosystem. Starting with Kusama.
+Distributing information about incentives for participating in the Polkadot ecosystem. Starting with Kusama.
 
 ## Table of contents
 
