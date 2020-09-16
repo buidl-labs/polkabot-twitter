@@ -1,0 +1,3 @@
+[submodule "polkabot-frontend"]
+	path = polkabot-frontend
+	url = https://github.com/buidl-labs/polkabot-frontend.git
