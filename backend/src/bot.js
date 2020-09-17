@@ -12,7 +12,6 @@ const mongoose = require("mongoose");
 const Validator = require("./Validator");
 // Initialize bot
 const bot = new Twit(config.twitterKeys);
-const { ApiPromise, WsProvider } = require("@polkadot/api");
 const EventEmitter = require("events");
 const eraChange = new EventEmitter();
 
@@ -294,7 +293,7 @@ async function takeScreenShot(
 	console.log("Launching chromium");
 	const browser = await puppeteer.launch({
 		// args: ["--no-sandbox"],
-		headless: false,
+		// headless: false,
 		product: "firefox",
 	});
 	const page = await browser.newPage();
