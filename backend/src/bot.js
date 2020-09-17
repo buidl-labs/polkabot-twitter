@@ -258,7 +258,7 @@ const main = async () => {
 			currentEra = data[0].eraIndex;
 			topValidatorData = data[0];
 			// && previousEra !== 0
-			if (currentEra > previousEra && previousEra !== 0) {
+			if (currentEra > previousEra) {
 				//   Sentry.captureMessage(`Era changed at: ${new Date()}`);
 				eraChange.emit("newEra");
 			}
@@ -273,7 +273,7 @@ setInterval(() => {
 		console.log(err);
 		process.exit(1);
 	});
-}, 10 * 60 * 1000);
+}, 0.5 * 60 * 1000);
 
 // This will allow the bot to run on now.sh
 const server = createServer((req, res) => {
@@ -291,11 +291,7 @@ async function takeScreenShot(
 	fullPage
 ) {
 	console.log("Launching chromium");
-	const browser = await puppeteer.launch({
-		// args: ["--no-sandbox"],
-		// headless: false,
-		product: "firefox",
-	});
+	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
 
 	console.log("validatorUrl", validatorUrl);
@@ -340,6 +336,8 @@ async function uploadImages(images, validator) {
 			? validator.stashId.slice(0, 5) + "..." + validator.stashId.slice(-5)
 			: validator.stashId;
 
+	actorIdentity = "abc";
+
 	const poolReward = validator.estimatedPoolReward.toFixed(3);
 	// console.log(poolReward);
 
@@ -376,7 +374,7 @@ async function uploadImages(images, validator) {
 			// console.log("list", list);
 			bot
 				.post("statuses/update", {
-					status: `${actorIdentity}'s pool was the highest earning validator pool for the previous era on @kusamanetwork with ${poolReward} KSM ($${subPoolReward.toFixed(
+					status: `${actorIdentity}'s pool was the highest earning validator pool for the previous era on kusamanetwork with ${poolReward} KSM ($${subPoolReward.toFixed(
 						2
 					)}) earned.`,
 					media_ids: list,
@@ -449,7 +447,7 @@ async function uploadNomImages(images, nominator) {
 			console.log("list", list);
 			bot
 				.post("statuses/update", {
-					status: `${actorIdentity} was the highest earning nominator for the previous era on @kusamanetwork with ${nomReward} KSM ($${subPoolReward.toFixed(
+					status: `${actorIdentity} was the highest earning nominator for the previous era on kusamanetwork with ${nomReward} KSM ($${subPoolReward.toFixed(
 						2
 					)}) earned.`,
 					media_ids: list,
