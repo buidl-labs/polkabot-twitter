@@ -291,7 +291,11 @@ async function takeScreenShot(
 	fullPage
 ) {
 	console.log("Launching chromium");
-	const browser = await puppeteer.launch();
+	const browser = await puppeteer.launch({
+		args: ["--no-sandbox"],
+		headless: true,
+		ignoreHTTPSErrors: true,
+	});
 	const page = await browser.newPage();
 
 	console.log("validatorUrl", validatorUrl);
