@@ -376,7 +376,7 @@ async function uploadImages(images, validator) {
 			// console.log("list", list);
 			bot
 				.post("statuses/update", {
-					status: `${actorIdentity}'s pool was the highest earning validator pool for the previous era on kusamanetwork with ${poolReward} KSM ($${subPoolReward.toFixed(
+					status: `${actorIdentity}'s pool was the highest earning validator pool for the previous era on @kusamanetwork with ${poolReward} KSM ($${subPoolReward.toFixed(
 						2
 					)}) earned.`,
 					media_ids: list,
@@ -449,7 +449,7 @@ async function uploadNomImages(images, nominator) {
 			console.log("list", list);
 			bot
 				.post("statuses/update", {
-					status: `${actorIdentity} was the highest earning nominator for the previous era on kusamanetwork with ${nomReward} KSM ($${subPoolReward.toFixed(
+					status: `${actorIdentity} was the highest earning nominator for the previous era on @kusamanetwork with ${nomReward} KSM ($${subPoolReward.toFixed(
 						2
 					)}) earned.`,
 					media_ids: list,
