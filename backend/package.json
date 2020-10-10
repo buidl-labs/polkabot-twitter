@@ -18,7 +18,7 @@
     "pretty-quick": "1.8.0"
   },
   "dependencies": {
-    "@sentry/node": "^5.11.0",
+    "@sentry/node": "^5.24.2",
     "axios": "^0.20.0",
     "dotenv": "6.1.0",
     "mongoose": "^5.8.7",
